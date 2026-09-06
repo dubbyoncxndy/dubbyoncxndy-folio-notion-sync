@@ -1,0 +1,29 @@
+name: Sync Folio assignments to Notion
+
+on:
+  schedule:
+    # Every 3 hours. GitHub Actions cron runs in UTC.
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run sync
+        env:
+          ICS_URL: ${{ secrets.ICS_URL }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python sync_folio_to_notion.py
